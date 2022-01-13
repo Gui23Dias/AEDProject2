@@ -63,7 +63,7 @@ void tree_insert(tree_node_t **link, tree_node_t *node, int main_idx){
   
   if(*link == NULL)
     *link = node;
-  else if(compare_tree_nodes(*link,node,main_idx) < 0)
+  else if(compare_tree_nodes(*link,node,main_idx) > 0)
     tree_insert(&((*link)->left[main_idx]),node,main_idx);
   else
     tree_insert(&((*link)->right[main_idx]),node,main_idx);
@@ -79,10 +79,10 @@ tree_node_t *find(tree_node_t *link, tree_node_t *node, int main_idx) {
     return NULL;
   }
   int compare = compare_tree_nodes(link,node,main_idx);
-  if(compare < 0)
-    return search_recursive(link->left[main_idx],main_idx);
-  else if (compare > 0)
-    return search_recursive(link->right[main_idx],main_idx);
+  if(compare > 0)
+    return find(link->left[main_idx], node, main_idx);
+  else if (compare < 0)
+    return find(link->right[main_idx], node, main_idx);
   else 
     return link;
 }
@@ -93,15 +93,15 @@ tree_node_t *find(tree_node_t *link, tree_node_t *node, int main_idx) {
 //
 
 int tree_depth(tree_node_t *link ){
-  //int depth = tree_depth(root);
+    //   int depth = tree_depth(root);
   int left_depth, right_depth;
 
   if (link == NULL)
     return 0;
 
   //Recursively calculates the depth
-  left_depth = tree_depth(link->left);
-  right_depth = tree_depth(link->right);
+  left_depth = tree_depth(*link->left);
+  right_depth = tree_depth(*link->right);
 
   //At the end, gets the highest depth and sums 1 because of the node passed
   link->depth = (left_depth >= right_depth) ? 1 + left_depth : 1 + right_depth;
@@ -112,11 +112,17 @@ int tree_depth(tree_node_t *link ){
 //
 // list, i,e, traverse the tree (place your code here)
 //
-
-int list(...){
-
+int counter = 1;
+void list(tree_node_t *link, int main_idx){
+  if(link != NULL){
+    list(link->left[main_idx],main_idx);
+    printf("Person #%d\n",counter++);
+    printf("    name --------------- %s\n", link->name);
+    printf("    zip code ----------- %s\n", link->zip_code);
+    printf("    telephone number --- %s\n", link->telephone_number);
+    list(link->right[main_idx],main_idx);
+  }
 }
-
 
 //
 // main program
@@ -170,7 +176,7 @@ int main(int argc,char **argv)
     roots[main_index] = NULL;
   for(int i = 0;i < n_persons;i++)
     for(int main_index = 0;main_index < 3;main_index++)
-      tree_insert(roots, &persons[i], main_index) ; // place your code here to insert &(persons[i]) in the tree with number main_index
+      tree_insert(&roots[main_index], &persons[i], main_index) ; // place your code here to insert &(persons[i]) in the tree with number main_index
   dt = cpu_time() - dt;
   printf("Tree creation time (%d persons): %.3es\n",n_persons,dt);
   // search the tree
@@ -180,7 +186,7 @@ int main(int argc,char **argv)
     for(int i = 0;i < n_persons;i++)
     {
       tree_node_t n = persons[i]; // make a copy of the node data
-      if(find(roots, &persons[i], main_index) != &(persons[i])) // place your code here to find a given person, searching for it using the tree with number main_index
+      if(find(roots[main_index], &n , main_index) != &(persons[i])) // place your code here to find a given person, searching for it using the tree with number main_index
       {
         fprintf(stderr,"person %d not found using index %d\n",i,main_index);
         return 1;
@@ -193,7 +199,7 @@ int main(int argc,char **argv)
   for(int main_index = 0;main_index < 3;main_index++)
   {
     dt = cpu_time();
-    int depth = tree_depth(roots); // place your code here to compute the depth of the tree with number main_index
+    int depth = tree_depth(roots[main_index]); // place your code here to compute the depth of the tree with number main_index
     dt = cpu_time() - dt;
     printf("Tree depth for index %d: %d (done in %.3es)\n",main_index,depth,dt);
   }
@@ -208,7 +214,7 @@ int main(int argc,char **argv)
       if(main_index > 2)
         main_index = 2;
       printf("List of persons:\n");
-      (void)list( ... ); // place your code here to traverse, in order, the tree with number main_index
+      (void)list(roots[main_index], main_index); // place your code here to traverse, in order, the tree with number main_index
     }
     // place your own options here
   }
