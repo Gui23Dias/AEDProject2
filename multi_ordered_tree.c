@@ -25,7 +25,8 @@ typedef struct tree_node_s
   char zip_code[MAX_ZIP_CODE_SIZE + 1];                 // index 1 data item
   char telephone_number[MAX_TELEPHONE_NUMBER_SIZE + 1]; // index 2 data item
   struct tree_node_s *left[3];                          // left pointers (one for each index) ---- left means smaller
-  struct tree_node_s *right[3];                         // right pointers (one for each index) --- right means larger
+  struct tree_node_s *right[3];                        // right pointers (one for each index) --- right means larger
+  long depth;                                          // depth of the tree
 }
 tree_node_t;
 
@@ -91,8 +92,20 @@ tree_node_t *find(tree_node_t *link, tree_node_t *node, int main_idx) {
 // tree depdth
 //
 
-int tree_depth( ... )
-{
+int tree_depth(tree_node_t *link ){
+  //int depth = tree_depth(root);
+  int left_depth, right_depth;
+
+  if (link == NULL)
+    return 0;
+
+  //Recursively calculates the depth
+  left_depth = tree_depth(link->left);
+  right_depth = tree_depth(link->right);
+
+  //At the end, gets the highest depth and sums 1 because of the node passed
+  link->depth = (left_depth >= right_depth) ? 1 + left_depth : 1 + right_depth;
+  return link->depth;
 }
 
 
@@ -100,8 +113,8 @@ int tree_depth( ... )
 // list, i,e, traverse the tree (place your code here)
 //
 
-int list( ... )
-{
+int list(...){
+
 }
 
 
@@ -180,7 +193,7 @@ int main(int argc,char **argv)
   for(int main_index = 0;main_index < 3;main_index++)
   {
     dt = cpu_time();
-    int depth = tree_depth( ... ); // place your code here to compute the depth of the tree with number main_index
+    int depth = tree_depth(roots); // place your code here to compute the depth of the tree with number main_index
     dt = cpu_time() - dt;
     printf("Tree depth for index %d: %d (done in %.3es)\n",main_index,depth,dt);
   }
