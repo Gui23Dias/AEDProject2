@@ -58,8 +58,14 @@ int compare_tree_nodes(tree_node_t *node1,tree_node_t *node2,int main_idx)
 // tree insertion routine (place your code here)
 //
 
-void tree_insert( ... )
-{
+void tree_insert(tree_node_t **link, tree_node_t *node, int main_idx){
+  
+  if(*link == NULL)
+    *link = node;
+  else if(compare_tree_nodes(*link,node,main_idx) < 0)
+    tree_insert(&((*link)->left[main_idx]),node,main_idx);
+  else
+    tree_insert(&((*link)->right[main_idx]),node,main_idx);
 }
 
 
@@ -67,8 +73,17 @@ void tree_insert( ... )
 // tree search routine (place your code here)
 //
 
-tree_node_t *find( ... )
-{
+tree_node_t *find(tree_node_t *link, tree_node_t *node, int main_idx) {
+  if(link == NULL){
+    return NULL;
+  }
+  int compare = compare_tree_nodes(link,node,main_idx);
+  if(compare < 0)
+    return search_recursive(link->left[main_idx],main_idx);
+  else if (compare > 0)
+    return search_recursive(link->right[main_idx],main_idx);
+  else 
+    return link;
 }
 
 
@@ -142,7 +157,7 @@ int main(int argc,char **argv)
     roots[main_index] = NULL;
   for(int i = 0;i < n_persons;i++)
     for(int main_index = 0;main_index < 3;main_index++)
-      ... ; // place your code here to insert &(persons[i]) in the tree with number main_index
+      tree_insert(roots, &persons[i], main_index) ; // place your code here to insert &(persons[i]) in the tree with number main_index
   dt = cpu_time() - dt;
   printf("Tree creation time (%d persons): %.3es\n",n_persons,dt);
   // search the tree
@@ -152,7 +167,7 @@ int main(int argc,char **argv)
     for(int i = 0;i < n_persons;i++)
     {
       tree_node_t n = persons[i]; // make a copy of the node data
-      if(find( ... ) != &(persons[i])) // place your code here to find a given person, searching for it using the tree with number main_index
+      if(find(roots, &persons[i], main_index) != &(persons[i])) // place your code here to find a given person, searching for it using the tree with number main_index
       {
         fprintf(stderr,"person %d not found using index %d\n",i,main_index);
         return 1;
