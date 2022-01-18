@@ -24,9 +24,10 @@ typedef struct tree_node_s
   char name[MAX_NAME_SIZE + 1];                         // index 0 data item
   char zip_code[MAX_ZIP_CODE_SIZE + 1];                 // index 1 data item
   char telephone_number[MAX_TELEPHONE_NUMBER_SIZE + 1]; // index 2 data item
-  struct tree_node_s *left[3];                          // left pointers (one for each index) ---- left means smaller
-  struct tree_node_s *right[3];                        // right pointers (one for each index) --- right means larger
-  long depth;                                          // depth of the tree
+  char cc[MAX_CC_NUMBER_SIZE+1];                        // index 3 data item
+  struct tree_node_s *left[4];                          // left pointers (one for each index) ---- left means smaller
+  struct tree_node_s *right[4];                         // right pointers (one for each index) --- right means larger
+  long depth;                                           // depth of the tree
 }
 tree_node_t;
 
@@ -45,11 +46,13 @@ int compare_tree_nodes(tree_node_t *node1,tree_node_t *node2,int main_idx)
       c = strcmp(node1->name,node2->name);
     else if(main_idx == 1)
       c = strcmp(node1->zip_code,node2->zip_code);
-    else
+    else if (main_idx == 2)
       c = strcmp(node1->telephone_number,node2->telephone_number);
+    else
+       c = strcmp(node1->cc,node2->cc);
     if(c != 0)
       return c; // different on this index, so return
-    main_idx = (main_idx == 2) ? 0 : main_idx + 1; // advance to the next index
+    main_idx = (main_idx == 3) ? 0 : main_idx + 1; // advance to the next index
   }
   return 0;
 }
@@ -92,20 +95,22 @@ tree_node_t *find(tree_node_t *link, tree_node_t *node, int main_idx) {
 // tree depdth
 //
 
-int tree_depth(tree_node_t *link ){
-    //   int depth = tree_depth(root);
-  int left_depth, right_depth;
+int tree_depth(tree_node_t *link, int main_idx){
 
   if (link == NULL)
     return 0;
 
   //Recursively calculates the depth
-  left_depth = tree_depth(*link->left);
-  right_depth = tree_depth(*link->right);
+  
+  int left_depth = tree_depth(link->left[main_idx], main_idx);
+  int right_depth = tree_depth(link->right[main_idx], main_idx);
 
-  //At the end, gets the highest depth and sums 1 because of the node passed
-  link->depth = (left_depth >= right_depth) ? 1 + left_depth : 1 + right_depth;
-  return link->depth;
+
+  if (left_depth > right_depth){
+    return left_depth +1;
+  }
+
+  return right_depth+1 ;
 }
 
 
@@ -114,15 +119,39 @@ int tree_depth(tree_node_t *link ){
 //
 int counter = 1;
 void list(tree_node_t *link, int main_idx){
+
   if(link != NULL){
     list(link->left[main_idx],main_idx);
     printf("Person #%d\n",counter++);
     printf("    name --------------- %s\n", link->name);
     printf("    zip code ----------- %s\n", link->zip_code);
     printf("    telephone number --- %s\n", link->telephone_number);
+    printf("    cc ----------------- %s\n", link->cc);
     list(link->right[main_idx],main_idx);
   }
 }
+
+
+
+void *find_zip_code(tree_node_t *link, char *zip){
+
+  if(link != NULL){
+    if (strcmp(link->zip_code, zip) == 0){
+      find_zip_code(link->left[1],zip);
+      printf("Person #%d\n",counter++);
+      printf("    name --------------- %s\n", link->name);
+      printf("    zip code ----------- %s\n", link->zip_code);
+      printf("    telephone number --- %s\n", link->telephone_number);
+      printf("    cc ----------------- %s\n", link->cc);
+      find_zip_code(link->right[1],zip);
+    }
+    else{
+      find_zip_code(link->left[1],zip);
+      find_zip_code(link->right[1],zip);
+    }
+  }
+}
+
 
 //
 // main program
@@ -133,7 +162,7 @@ int main(int argc,char **argv)
   double dt;
 
   // process the command line arguments
-  if(argc < 3)
+  if(argc < 4)
   {
     fprintf(stderr,"Usage: %s student_number number_of_persons [options ...]\n",argv[0]);
     fprintf(stderr,"Recognized options:\n");
@@ -166,21 +195,22 @@ int main(int argc,char **argv)
     random_name(&(persons[i].name[0]));
     random_zip_code(&(persons[i].zip_code[0]));
     random_telephone_number(&(persons[i].telephone_number[0]));
-    for(int j = 0;j < 3;j++)
+    random_cc(&(persons[i].cc[0]));
+    for(int j = 0;j < 4;j++)
       persons[i].left[j] = persons[i].right[j] = NULL; // make sure the pointers are initially NULL
   }
   // create the ordered binary trees
   dt = cpu_time();
-  tree_node_t *roots[3]; // three indices, three roots
-  for(int main_index = 0;main_index < 3;main_index++)
+  tree_node_t *roots[4]; // three indices, three roots
+  for(int main_index = 0;main_index < 4;main_index++)
     roots[main_index] = NULL;
   for(int i = 0;i < n_persons;i++)
-    for(int main_index = 0;main_index < 3;main_index++)
+    for(int main_index = 0;main_index < 4;main_index++)
       tree_insert(&roots[main_index], &persons[i], main_index) ; // place your code here to insert &(persons[i]) in the tree with number main_index
   dt = cpu_time() - dt;
   printf("Tree creation time (%d persons): %.3es\n",n_persons,dt);
   // search the tree
-  for(int main_index = 0;main_index < 3;main_index++)
+  for(int main_index = 0;main_index < 4;main_index++)
   {
     dt = cpu_time();
     for(int i = 0;i < n_persons;i++)
@@ -196,10 +226,10 @@ int main(int argc,char **argv)
     printf("Tree search time (%d persons, index %d): %.3es\n",n_persons,main_index,dt);
   }
   // compute the largest tree depdth
-  for(int main_index = 0;main_index < 3;main_index++)
+  for(int main_index = 0;main_index < 4;main_index++)
   {
     dt = cpu_time();
-    int depth = tree_depth(roots[main_index]); // place your code here to compute the depth of the tree with number main_index
+    int depth = tree_depth(roots[main_index],main_index); // place your code here to compute the depth of the tree with number main_index
     dt = cpu_time() - dt;
     printf("Tree depth for index %d: %d (done in %.3es)\n",main_index,depth,dt);
   }
@@ -211,10 +241,14 @@ int main(int argc,char **argv)
       int main_index = atoi(&(argv[i][5]));
       if(main_index < 0)
         main_index = 0;
-      if(main_index > 2)
-        main_index = 2;
+      if(main_index > 3)
+        main_index = 3;
        printf("List of persons:\n");
        (void)list(roots[main_index], main_index); // place your code here to traverse, in order, the tree with number main_index
+    } else if (strcmp(argv[i],"-find") == 0){
+      printf("List of people with the zip code '%s' is: \n", argv[i+1]);
+      find_zip_code(roots[i], argv[i+1]);
+
     }
     // place your own options here
   }

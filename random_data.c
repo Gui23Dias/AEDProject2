@@ -1933,3 +1933,13 @@ void random_telephone_number(char telephone_number[MAX_TELEPHONE_NUMBER_SIZE + 1
     exit(1);
   }
 }
+
+
+void random_cc(char cc[MAX_CC_NUMBER_SIZE + 1])
+{
+  int n1 = aed_random() % 100000000;        //  000..999
+  if(snprintf(cc,MAX_CC_NUMBER_SIZE + 1,"%08d",n1) >= MAX_CC_NUMBER_SIZE + 1)
+  {
+    fprintf(stderr,"CC number too large (%08d)\n",n1);
+  }
+}
