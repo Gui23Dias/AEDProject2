@@ -213,8 +213,8 @@ int main(int argc,char **argv)
         main_index = 0;
       if(main_index > 2)
         main_index = 2;
-      printf("List of persons:\n");
-      (void)list(roots[main_index], main_index); // place your code here to traverse, in order, the tree with number main_index
+       printf("List of persons:\n");
+       (void)list(roots[main_index], main_index); // place your code here to traverse, in order, the tree with number main_index
     }
     // place your own options here
   }
