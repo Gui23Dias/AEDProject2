@@ -24,7 +24,7 @@ typedef struct tree_node_s
   char name[MAX_NAME_SIZE + 1];                         // index 0 data item
   char zip_code[MAX_ZIP_CODE_SIZE + 1];                 // index 1 data item
   char telephone_number[MAX_TELEPHONE_NUMBER_SIZE + 1]; // index 2 data item
-  char cc[MAX_CC_NUMBER_SIZE+1];                        // index 3 data item
+  char ssn[MAX_SSN_NUMBER_SIZE+1];                        // index 3 data item
   struct tree_node_s *left[4];                          // left pointers (one for each index) ---- left means smaller
   struct tree_node_s *right[4];                         // right pointers (one for each index) --- right means larger
   long depth;                                           // depth of the tree
@@ -49,7 +49,7 @@ int compare_tree_nodes(tree_node_t *node1,tree_node_t *node2,int main_idx)
     else if (main_idx == 2)
       c = strcmp(node1->telephone_number,node2->telephone_number);
     else
-       c = strcmp(node1->cc,node2->cc);
+       c = strcmp(node1->ssn,node2->ssn);
     if(c != 0)
       return c; // different on this index, so return
     main_idx = (main_idx == 3) ? 0 : main_idx + 1; // advance to the next index
@@ -127,10 +127,10 @@ void list(tree_node_t *link, int main_idx){
   if(link != NULL){
     list(link->left[main_idx],main_idx);
     printf("Person #%d\n",counter++);
-    printf("    name --------------- %s\n", link->name);
-    printf("    zip code ----------- %s\n", link->zip_code);
-    printf("    telephone number --- %s\n", link->telephone_number);
-    printf("    cc ----------------- %s\n", link->cc);
+    printf("    name --------------------- %s\n", link->name);
+    printf("    zip code ----------------- %s\n", link->zip_code);
+    printf("    telephone number --------- %s\n", link->telephone_number);
+    printf("    social security number --- %s\n", link->ssn);
     list(link->right[main_idx],main_idx);
   }
 }
@@ -143,10 +143,10 @@ void *find_zip_code(tree_node_t *link, char *zip){
     if (strcmp(link->zip_code, zip) == 0){
       find_zip_code(link->left[1],zip);
       printf("Person #%d\n",counter++);
-      printf("    name --------------- %s\n", link->name);
-      printf("    zip code ----------- %s\n", link->zip_code);
-      printf("    telephone number --- %s\n", link->telephone_number);
-      printf("    cc ----------------- %s\n", link->cc);
+      printf("    name --------------------- %s\n", link->name);
+      printf("    zip code ----------------- %s\n", link->zip_code);
+      printf("    telephone number --------- %s\n", link->telephone_number);
+      printf("    social security number --- %s\n", link->ssn);
       find_zip_code(link->right[1],zip);
     }
     else{
@@ -199,7 +199,7 @@ int main(int argc,char **argv)
     random_name(&(persons[i].name[0]));
     random_zip_code(&(persons[i].zip_code[0]));
     random_telephone_number(&(persons[i].telephone_number[0]));
-    random_cc(&(persons[i].cc[0]));
+    random_ssn(&(persons[i].ssn[0]));
     for(int j = 0;j < 4;j++)
       persons[i].left[j] = persons[i].right[j] = NULL; // make sure the pointers are initially NULL
   }
